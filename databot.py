@@ -3,6 +3,8 @@
 
 import pyowm
 import time
+import scrollphathd
+from scrollphathd.fonts import font5x5
 from threading import Timer
 from pypollen import Pollen
 from clientsecrets import owmkey
@@ -13,6 +15,11 @@ latitude = 55.03973
 longitude = -1.44713
 
 interval = 10 # seconds between API data updates
+showTime = 3  # seconds for each data display
+
+BRIGHTNESS = 0.1
+scrollphathd.rotate(degrees=180)
+
 
 pressureReport = 0
 pollenReport = "NAN"
@@ -86,7 +93,10 @@ def displayClock():
 
     timeString = time.strftime("%H:%M")
     print(timeString)
-    time.sleep(1)
+    scrollphathd.clear()
+    scrollphathd.write_string(timeString, font=font5x5, brightness=BRIGHTNESS)
+    scrollphathd.show()
+    time.sleep(showTime)
 
 
 if __name__ == "__main__":
@@ -95,15 +105,30 @@ if __name__ == "__main__":
     pressureReport = updatePressure()
     pollenReport = updatePollen()
 
-    # Start the data update timers
+    # Clear the screen
+    scrollphathd.clear()
+
+    # Start the data update timers, effectively on background threads
     rtPressure = RepeatedTimer(interval, updatePressure)
     rtPollen = RepeatedTimer(interval, updatePollen)
 
     # ...and now we can loop
     while True:
         displayClock()
-        displayClock()
+
+        scrollphathd.clear()
+        # Need to cast int to String to display correctly on ScrollpHAT
+        scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
+        scrollphathd.show()        
         print(pressureReport)
-        time.sleep(2)
+        time.sleep(showTime)
+
+
+        # Pollen compoment doesn't display correctly - no loop for scrolling.
+        # Need to rewrite to a function call which handles the display/update in a timed loop
+        scrollphathd.clear()
+        scrollphathd.write_string(pollenReport, font=font5x5, brightness=BRIGHTNESS)
+        scrollphathd.show()
+        scrollphathd.scroll()
         print(pollenReport)
-        time.sleep(2)
+        time.sleep(showTime)
