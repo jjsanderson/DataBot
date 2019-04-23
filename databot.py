@@ -4,23 +4,24 @@
 import pyowm
 import time
 import scrollphathd
-from scrollphathd.fonts import font5x5
+from scrollphathd.fonts import font5x5, font5x7
 from threading import Timer
 from pypollen import Pollen
 from clientsecrets import owmkey
 
 owm = pyowm.OWM(owmkey)
 
+# Lat and long here for where I live; replace as you wish.
 latitude = 55.03973
 longitude = -1.44713
 
-interval = 10 # seconds between API data updates
-showTime = 3  # seconds for each data display
+interval = 15 * 60 # seconds between API data updates (15 mins)
+showTime = 3  # seconds for each data display. 3 seconds feels about right.
 
-BRIGHTNESS = 0.1
-scrollphathd.rotate(degrees=180)
+BRIGHTNESS = 0.1 # the ScrollpHAT HD is insanely bright. This is enough, for me.
+scrollphathd.rotate(degrees=180) # My unit is in a ScrollBot case. Which is upside-down
 
-
+# Initialise our global variables with empty values
 pressureReport = 0
 pollenReport = "NAN"
 
@@ -74,6 +75,7 @@ def updatePressure():
     observation = owm.weather_at_id(2634032) # Prefer this approach if possible
     w = observation.get_weather()
     pressureReport = w.get_pressure()['press']
+    # print("Pressure updated from API")
     return pressureReport
 
 
@@ -83,7 +85,15 @@ def updatePollen():
     Triggered on a timer to avoid overloading API.
     """
     global pollenReport
-    pollenReport = Pollen(latitude, longitude).pollencount
+    # re-initialise the string with a leading space, to avoid it
+    # scrolling off the display immediately.
+    pollenReport = " "
+    # Alternate lines: the 5x7 font lacks lowercase letters,
+    # so convert here ... or don't, accordingly.
+    pollenReport += Pollen(latitude, longitude).pollencount.upper()
+    # pollenReport = Pollen(latitude, longitude).pollencount
+    pollenReport += "  "
+    # print("Pollen updated from API")
     return pollenReport
 
 
@@ -92,11 +102,42 @@ def displayClock():
     """
 
     timeString = time.strftime("%H:%M")
-    print(timeString)
+    # print(timeString)
     scrollphathd.clear()
     scrollphathd.write_string(timeString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
     time.sleep(showTime)
+
+
+def displayPressure(startTime):
+    """Documentation.
+    """
+    global showTime
+    global pressureReport
+    targetTime = startTime + showTime
+    scrollphathd.clear()
+    scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
+    scrollphathd.show()    
+    # print(pressureReport)    
+        
+    while (time.time() < targetTime):
+        time.sleep(0.05)
+    
+
+def displayPollen(startTime):
+    """Documentation.
+    """
+    global showTime
+    global pollenReport
+    targetTime = startTime + showTime
+    scrollphathd.clear()
+    scrollphathd.write_string(pollenReport, font=font5x5, brightness=BRIGHTNESS)
+    # print(pollenReport)
+
+    while (time.time() < targetTime):
+        scrollphathd.show()
+        scrollphathd.scroll()
+        time.sleep(0.1)
 
 
 if __name__ == "__main__":
@@ -115,20 +156,6 @@ if __name__ == "__main__":
     # ...and now we can loop
     while True:
         displayClock()
-
-        scrollphathd.clear()
-        # Need to cast int to String to display correctly on ScrollpHAT
-        scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
-        scrollphathd.show()        
-        print(pressureReport)
-        time.sleep(showTime)
-
-
-        # Pollen compoment doesn't display correctly - no loop for scrolling.
-        # Need to rewrite to a function call which handles the display/update in a timed loop
-        scrollphathd.clear()
-        scrollphathd.write_string(pollenReport, font=font5x5, brightness=BRIGHTNESS)
-        scrollphathd.show()
-        scrollphathd.scroll()
-        print(pollenReport)
-        time.sleep(showTime)
+        displayPressure(time.time())
+        displayPollen(time.time())
+        # ...and around we go again.
