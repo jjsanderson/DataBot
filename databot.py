@@ -70,6 +70,7 @@ def updatePressure():
     
     Triggered on a timer to avoid overloading API.
     """
+    # TODO: wrap the API call here in a try block
     global pressureReport
     # observation = owm.weather_at_place('Whitley Bay,GB')
     observation = owm.weather_at_id(2634032) # Prefer this approach if possible
@@ -85,13 +86,22 @@ def updatePollen():
     Triggered on a timer to avoid overloading API.
     """
     global pollenReport
+
+    # Save the old report
+    oldReport = pollenReport
+    
     # re-initialise the string with a leading space, to avoid it
     # scrolling off the display immediately.
     pollenReport = " "
     # Alternate lines: the 5x7 font lacks lowercase letters,
     # so convert here ... or don't, accordingly.
-    pollenReport += Pollen(latitude, longitude).pollencount.upper()
-    # pollenReport = Pollen(latitude, longitude).pollencount
+    try:
+        newReport = Pollen(latitude, longitude).pollencount
+        pollenReport += newReport.upper()
+    except:
+        # Something went wrong, reinstate the old string
+        pollenReport += oldReport
+
     pollenReport += "  "
     # print("Pollen updated from API")
     return pollenReport
