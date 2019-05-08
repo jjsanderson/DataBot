@@ -70,13 +70,22 @@ def updatePressure():
     
     Triggered on a timer to avoid overloading API.
     """
-    # TODO: wrap the API call here in a try block
     global pressureReport
-    # observation = owm.weather_at_place('Whitley Bay,GB')
-    observation = owm.weather_at_id(2634032) # Prefer this approach if possible
-    w = observation.get_weather()
-    pressureReport = w.get_pressure()['press']
-    # print("Pressure updated from API")
+
+    # Save the old report
+
+    oldReport = pressureReport
+
+    try:
+        # observation = owm.weather_at_place('Whitley Bay,GB')
+        observation = owm.weather_at_id(2634032) # Prefer this approach if possible
+        w = observation.get_weather()
+        pressureReport = w.get_pressure()['press']
+        # print("Pressure updated from API")
+    except:
+        # Something went wrong, reinstate the old value
+        pressureReport = oldReport
+    
     return pressureReport
 
 
