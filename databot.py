@@ -112,6 +112,8 @@ def updatePollen():
         pollenReport = " " + newReport.upper() + " "
         # pollenReport += newReport.upper()
     except:
+        # Something went wrong, display error
+        pollenReport = " POLLEN ERROR "
         raise RuntimeError('Pollen API error')
         # Something went wrong, reinstate the old string
         # pollenReport += oldReport
