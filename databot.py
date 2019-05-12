@@ -15,7 +15,7 @@ owm = pyowm.OWM(owmkey)
 latitude = 55.03973
 longitude = -1.44713
 
-interval = 15 * 60 # seconds between API data updates (15 mins)
+interval = 20 * 60 # seconds between API data updates (15 mins)
 showTime = 3  # seconds for each data display. 3 seconds feels about right.
 
 BRIGHTNESS = 0.1 # the ScrollpHAT HD is insanely bright. This is enough, for me.
@@ -90,7 +90,7 @@ def updatePressure():
 
 
 def updatePollen():
-    """Fetch pollen data from Benadryle / Met. Office.
+    """Fetch pollen data from Benadryl / Met. Office.
 
     Triggered on a timer to avoid overloading API.
     """
@@ -102,16 +102,21 @@ def updatePollen():
     # re-initialise the string with a leading space, to avoid it
     # scrolling off the display immediately.
     pollenReport = " "
+
     # Alternate lines: the 5x7 font lacks lowercase letters,
     # so convert here ... or don't, accordingly.
     try:
         newReport = Pollen(latitude, longitude).pollencount
-        pollenReport += newReport.upper()
+        # If we're still here, we must have a new report
+        # ...so rewrite the global
+        pollenReport = " " + newReport.upper() + " "
+        # pollenReport += newReport.upper()
     except:
+        raise RuntimeError('Pollen API error')
         # Something went wrong, reinstate the old string
-        pollenReport += oldReport
+        # pollenReport += oldReport
 
-    pollenReport += "  "
+    # pollenReport += "  "
     # print("Pollen updated from API")
     return pollenReport
 
@@ -156,7 +161,7 @@ def displayPollen(startTime):
     while (time.time() < targetTime):
         scrollphathd.show()
         scrollphathd.scroll()
-        time.sleep(0.1)
+        time.sleep(0.075)
 
 
 if __name__ == "__main__":
