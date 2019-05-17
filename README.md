@@ -2,9 +2,9 @@
 
 Simple hack to display a rotation of current time, current atmospheric pressure, and today's pollen forecast, on a Pimoroni ScrollpHAT HD display, attached to a Pi Zero.
 
-As of 2019-04-23 there's no error handling on API update requests, so this won't necessarily be very roboust. But hey, it's worth a try.
+As of 2019-05-17 there's no minimal handling on API update requests, so this won't necessarily be very roboust. But it mostly works in my testing – though see below for pollen count issue.
 
-Totals about 10% CPU on a Pi Zero W, with just this script running on a no-GUI Raspbian install. Initial RAM usage is about 50Mb.
+Totals about 10% CPU on a Pi Zero W, with just this script running on a no-GUI Raspbian install. Initial RAM usage is about 50Mb for the whole system.
 
 ## Installation
 
