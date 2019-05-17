@@ -9,19 +9,22 @@ from threading import Timer
 from pypollen import Pollen
 from clientsecrets import owmkey
 
+# You'll need an Open Weather Map API key, stored in a clientsecrets.py file:
+# owmkey = 'you_key_here'
+# OWM query object here as a global, because I'm lazy.
 owm = pyowm.OWM(owmkey)
 
-# Lat and long here for where I live; replace as you wish.
+# Lat and long for where I live; replace as you wish.
 latitude = 55.03973
 longitude = -1.44713
 
-interval = 20 * 60 # seconds between API data updates (15 mins)
+interval = 30 * 60 # seconds between API data updates (30 mins)
 showTime = 3  # seconds for each data display. 3 seconds feels about right.
 
 BRIGHTNESS = 0.1 # the ScrollpHAT HD is insanely bright. This is enough, for me.
 scrollphathd.rotate(degrees=180) # My unit is in a ScrollBot case. Which is upside-down
 
-# Initialise our global variables with empty values
+# Initialise our variables as globals, with empty values
 pressureReport = 0
 pollenReport = "NAN"
 
@@ -73,7 +76,6 @@ def updatePressure():
     global pressureReport
 
     # Save the old report
-
     oldReport = pressureReport
 
     try:
@@ -93,7 +95,11 @@ def updatePollen():
     """Fetch pollen data from Benadryl / Met. Office.
 
     Triggered on a timer to avoid overloading API.
+    This is currently hacky because the API unstable, failing silently for
+    extended periods. I'm trying to debug, but suspect I'll have to 
+    scrape web page data instead.
     """
+    
     global pollenReport
 
     # Save the old report
@@ -109,6 +115,7 @@ def updatePollen():
         newReport = Pollen(latitude, longitude).pollencount
         # If we're still here, we must have a new report
         # ...so rewrite the global
+        # Call .upper because ScrollpHAT HD only has u/c characters in some fonts
         pollenReport = " " + newReport.upper() + " "
         # pollenReport += newReport.upper()
     except:
@@ -124,9 +131,10 @@ def updatePollen():
 
 
 def displayClock():
-    """Documentation string.
-    """
-
+    """Render current time to the ScrollpHAT."""
+    
+    global showTime
+    # Get the current time
     timeString = time.strftime("%H:%M")
     # print(timeString)
     scrollphathd.clear()
@@ -136,8 +144,8 @@ def displayClock():
 
 
 def displayPressure(startTime):
-    """Documentation.
-    """
+    """Render pressure data to the ScrollpHAT."""
+    
     global showTime
     global pressureReport
     targetTime = startTime + showTime
@@ -151,8 +159,8 @@ def displayPressure(startTime):
     
 
 def displayPollen(startTime):
-    """Documentation.
-    """
+    """Render pollen data to the ScrrollpHAT."""
+    
     global showTime
     global pollenReport
     targetTime = startTime + showTime
@@ -162,6 +170,7 @@ def displayPollen(startTime):
 
     while (time.time() < targetTime):
         scrollphathd.show()
+        # Some strings will be too long to display, so scroll laterally
         scrollphathd.scroll()
         time.sleep(0.075)
 
