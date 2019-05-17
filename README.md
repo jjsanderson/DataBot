@@ -1,6 +1,6 @@
 # DataBot
 
-Simple hack to display a rotation of current time, current atmospheric pressure, and today's pollen forecast, on a Pimoroni ScrollpHAT HD display, attached to a Pi Zero.
+Simple hack to display a rotation of current time, current atmospheric pressure, and today's pollen forecast, on a [Pimoroni ScrollpHAT HD](https://shop.pimoroni.com/products/scroll-phat-hd) display, attached to a [Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/).
 
 As of 2019-05-17 there's no minimal handling on API update requests, so this won't necessarily be very roboust. But it mostly works in my testing – though see below for pollen count issue.
 
