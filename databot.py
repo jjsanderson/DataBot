@@ -93,7 +93,7 @@ def updatePressure():
         pressureReport = oldReport
         tempReport = oldTempReport
     
-    return pressureReport, tempReport
+    return pressureReport
 
 
 def updatePollen():
@@ -166,7 +166,9 @@ def displayPressure(startTime):
     scrollphathd.write_string(str(tempReport), font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
 
-    while (time.time() < (2*targetTime)):
+    targetTime = time.time() + showTime
+
+    while (time.time() < targetTime):
         time.sleep(0.05)
     
 
