@@ -27,6 +27,7 @@ scrollphathd.rotate(degrees=180) # My unit is in a ScrollBot case. Which is upsi
 # Initialise our variables as globals, with empty values
 pressureReport = 0
 pollenReport = "NAN"
+tempReport = 0.0
 
 class RepeatedTimer(object):
     """Simple timer class, from StackExchange (obviously).
@@ -72,23 +73,27 @@ def updatePressure():
     """Fetch pressure data from OpenWeatherMap.
     
     Triggered on a timer to avoid overloading API.
+    - 2019-07-28 Also update daily max. temperature
     """
-    global pressureReport
+    global pressureReport, tempReport
 
     # Save the old report
     oldReport = pressureReport
+    oldTempReport = tempReport
 
     try:
         # observation = owm.weather_at_place('Whitley Bay,GB')
         observation = owm.weather_at_id(2634032) # Prefer this approach if possible
         w = observation.get_weather()
         pressureReport = w.get_pressure()['press']
+        tempReport = w.get_temperature(unit='celsius')['temp']
         # print("Pressure updated from API")
     except:
         # Something went wrong, reinstate the old value
         pressureReport = oldReport
+        tempReport = oldTempReport
     
-    return pressureReport
+    return pressureReport, tempReport
 
 
 def updatePollen():
@@ -103,7 +108,7 @@ def updatePollen():
     global pollenReport
 
     # Save the old report
-    oldReport = pollenReport
+    # oldReport = pollenReport
     
     # re-initialise the string with a leading space, to avoid it
     # scrolling off the display immediately.
@@ -155,6 +160,13 @@ def displayPressure(startTime):
     # print(pressureReport)    
         
     while (time.time() < targetTime):
+        time.sleep(0.05)
+
+    scrollphathd.clear()
+    scrollphathd.write_string(str(tempReport), font=font5x5, brightness=BRIGHTNESS)
+    scrollphathd.show()
+
+    while (time.time() < (2*targetTime)):
         time.sleep(0.05)
     
 
