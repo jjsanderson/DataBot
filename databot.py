@@ -6,7 +6,7 @@ import time
 import scrollphathd
 from scrollphathd.fonts import font5x5, font5x7
 from threading import Timer
-from pypollen import Pollen
+from pyquery import PyQuery as pq
 from clientsecrets import owmkey
 
 # You'll need an Open Weather Map API key, stored in a clientsecrets.py file:
@@ -97,17 +97,17 @@ def updatePressure():
 
 
 def updatePollen():
-    """Fetch pollen data from Benadryl / Met. Office.
+    """Fetch pollen data by scraping Met. Office website.
 
-    Triggered on a timer to avoid overloading API.
-    This is currently hacky because the API unstable, failing silently for
-    extended periods. I'm trying to debug, but suspect I'll have to 
-    scrape web page data instead.
+    Triggered on a timer to avoid overloading site.
+    Now scraping web data instead of using pypollen, since that was
+    unreliable. Hard-coded to North-East region ('ne').
     """
     
     global pollenReport
 
     # Save the old report
+    # Disabled for visible error reporting
     # oldReport = pollenReport
     
     # re-initialise the string with a leading space, to avoid it
@@ -117,21 +117,31 @@ def updatePollen():
     # Alternate lines: the 5x7 font lacks lowercase letters,
     # so convert here ... or don't, accordingly.
     try:
-        newReport = Pollen(latitude, longitude).pollencount
-        # If we're still here, we must have a new report
-        # ...so rewrite the global
-        # Call .upper because ScrollpHAT HD only has u/c characters in some fonts
-        pollenReport = " " + newReport.upper() + " "
-        # pollenReport += newReport.upper()
+        # Get the web page as a pyquery object
+        newReport = pq(url="https://www.metoffice.gov.uk/weather/warnings-and-advice/seasonal-advice/pollen-forecast")
+        # Drop into the HTML for the first results table for North-East
+        myReport = newReport("#ne table tbody tr td div span")
+        # Get the text representation of that element.
+        myReportText = myReport.html()
+
+        # Step through possible outcomes
+        if myReportText == "L":
+            pollenReport = " LOW "
+        elif myReportText == "M":
+            pollenReport = " MODERATE "
+        elif myReportText == "H":
+            pollenReport = " HIGH "
+        else:
+            # Not sure of other codes, so just display the raw string
+            pollenReport = myReportText
     except:
         # Something went wrong, display error
         pollenReport = " POLLEN ERROR "
-        raise RuntimeError('Pollen API error')
+        raise RuntimeError('Pollen scraping error')
         # Something went wrong, reinstate the old string
         # pollenReport += oldReport
 
-    # pollenReport += "  "
-    # print("Pollen updated from API")
+    print("Pollen updated from API")
     return pollenReport
 
 

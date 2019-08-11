@@ -11,7 +11,13 @@ Totals about 10% CPU on a Pi Zero W, with just this script running on a no-GUI R
 pip3 install required for:
 
     pyowm
-    pypollen
+    pyquery
+
+apt install required for:
+
+    sudo apt-get install libxslt-dev
+
+(lxml install with pyquery is partly broken on Raspbian Stretch, misses this library.)
 
 Sign up for an OpenWeatherMap API key, add to `clientsecrets.py` file in project root:
 
