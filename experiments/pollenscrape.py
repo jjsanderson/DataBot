@@ -1,6 +1,6 @@
 """Parsing test for pollen data from web source.
 
-Uses Beautiful Soup to parse HTML.
+Uses PyQuery to parse HTML.
 
     pip3 install pyquery
 
