@@ -131,6 +131,8 @@ def updatePollen():
             pollenReport = " MODERATE "
         elif myReportText == "H":
             pollenReport = " HIGH "
+        elif myReportText == "VH":
+            pollenReport = " VERY HIGH "
         else:
             # Not sure of other codes, so just display the raw string
             pollenReport = myReportText

@@ -35,7 +35,9 @@ See [Raspberry Pi docs](https://www.raspberrypi.org/documentation/linux/usage/sy
 
 As of 2019-05-17 updates using the PyPollen library to query the Benadryl site is flaky. I'm seeing some API errors, some slow updates, and some silent failures. From 2019-08-11 a revised UpdatePollen method scrapes the Met Office website directly and parses it using [PyQuery](https://pythonhosted.org/pyquery/).
 
+2020-06-23: Updated to allow for 'Very High' pollen reports, which somehow I'd missed last year.
+
 ### Worth doing at some point
 
-* Refactor this code to be a bit less ridiculous with global variables. That is: actually return variables sensibly. This is a bit tricky with the update jobs running as background threads, though, and that seems neater than hard-coding updates into the main loop. Maybe the main loop should handle API calls and the background thread should cycle the display?
+* Refactor this code to be a bit less ridiculous with global variables. That is: actually return variables sensibly. This is a bit tricky with the update jobs running as background threads, though, and that seems neater than hard-coding updates into the main loop. Maybe the main loop should handle API calls and the background thread should cycle the display? Or mumble mumble classes and objects mumble?
 
