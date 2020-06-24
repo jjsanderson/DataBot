@@ -10,7 +10,7 @@ from pyquery import PyQuery as pq
 from clientsecrets import owmkey
 
 # You'll need an Open Weather Map API key, stored in a clientsecrets.py file:
-# owmkey = 'you_key_here'
+# owmkey = 'your_key_here'
 # OWM query object here as a global, because I'm lazy.
 owm = pyowm.OWM(owmkey)
 
