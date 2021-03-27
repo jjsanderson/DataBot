@@ -89,10 +89,10 @@ def updatePressure():
         # w = observation.get_weather()
         pressureReport = observation.weather.pressure["press"]
         tempReport = observation.weather.temperature('celsius')['temp']
-        print("Pressure updated from API")
+        # print("Pressure updated from API")
     except:
         # Something went wrong, reinstate the old value
-        print(">>> Pressure error")
+        # print(">>> Pressure error")
         pressureReport = oldReport
         tempReport = oldTempReport
 
@@ -158,7 +158,7 @@ def displayClock():
     global showTime
     # Get the current time
     timeString = time.strftime("%H:%M")
-    print(timeString)
+    # print(timeString)
     scrollphathd.clear()
     scrollphathd.write_string(timeString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
@@ -174,7 +174,7 @@ def displayPressure(startTime):
     scrollphathd.clear()
     scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
-    print(pressureReport)
+    # print(pressureReport)
 
     while (time.time() < targetTime):
         time.sleep(0.05)
@@ -183,6 +183,7 @@ def displayPressure(startTime):
     tempString = str(round(tempReport, 1)) + "C"
     scrollphathd.write_string(tempString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
+    # print(tempString)
 
     targetTime = time.time() + showTime
 
@@ -209,9 +210,12 @@ def displayPollen(startTime):
 
 if __name__ == "__main__":
 
+    print(">>> DataBot starting")
     # Get data on initial start
     pressureReport = updatePressure()
     pollenReport = updatePollen()
+    print("Initial weather report received")
+    print("Initial pollen report received")
 
     # Clear the screen
     scrollphathd.clear()
@@ -219,6 +223,8 @@ if __name__ == "__main__":
     # Start the data update timers, effectively on background threads
     rtPressure = RepeatedTimer(interval, updatePressure)
     rtPollen = RepeatedTimer(interval, updatePollen)
+    print("Timers running")
+    print("looping...")
 
     # ...and now we can loop
     while True:
