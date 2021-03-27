@@ -13,6 +13,7 @@ from clientsecrets import owmkey
 # owmkey = 'your_key_here'
 # OWM query object here as a global, because I'm lazy.
 owm = pyowm.OWM(owmkey)
+mgr = owm.weather_manager()
 
 # Lat and long for where I live; replace as you wish.
 latitude = 55.03973
@@ -71,11 +72,12 @@ class RepeatedTimer(object):
 
 def updatePressure():
     """Fetch pressure data from OpenWeatherMap.
-    
+
     Triggered on a timer to avoid overloading API.
     - 2019-07-28 Also update daily max. temperature
+    - 2021-03-27 Fixes for PyOWM 3
     """
-    global pressureReport, tempReport
+    global pressureReport, tempReport, mgr
 
     # Save the old report
     oldReport = pressureReport
@@ -83,16 +85,17 @@ def updatePressure():
 
     try:
         # observation = owm.weather_at_place('Whitley Bay,GB')
-        observation = owm.weather_at_id(2634032) # Prefer this approach if possible
-        w = observation.get_weather()
-        pressureReport = w.get_pressure()['press']
-        tempReport = w.get_temperature(unit='celsius')['temp']
+        observation = mgr.weather_at_id(2634032) # Prefer this approach if possible
+        # w = observation.get_weather()
+        pressureReport = observation.weather.pressure["press"]
+        tempReport = observation.weather.temperature('celsius')['temp']
         print("Pressure updated from API")
     except:
         # Something went wrong, reinstate the old value
+        print(">>> Pressure error")
         pressureReport = oldReport
         tempReport = oldTempReport
-    
+
     return pressureReport
 
 
@@ -103,13 +106,13 @@ def updatePollen():
     Now scraping web data instead of using pypollen, since that was
     unreliable. Hard-coded to North-East region ('ne').
     """
-    
+
     global pollenReport
 
     # Save the old report
     # Disabled for visible error reporting
     # oldReport = pollenReport
-    
+
     # re-initialise the string with a leading space, to avoid it
     # scrolling off the display immediately.
     pollenReport = " "
@@ -151,7 +154,7 @@ def updatePollen():
 
 def displayClock():
     """Render current time to the ScrollpHAT."""
-    
+
     global showTime
     # Get the current time
     timeString = time.strftime("%H:%M")
@@ -164,15 +167,15 @@ def displayClock():
 
 def displayPressure(startTime):
     """Render pressure data to the ScrollpHAT."""
-    
+
     global showTime
     global pressureReport
     targetTime = startTime + showTime
     scrollphathd.clear()
     scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
-    scrollphathd.show()    
-    print(pressureReport)    
-        
+    scrollphathd.show()
+    print(pressureReport)
+
     while (time.time() < targetTime):
         time.sleep(0.05)
 
@@ -184,11 +187,11 @@ def displayPressure(startTime):
 
     while (time.time() < targetTime):
         time.sleep(0.05)
-    
+
 
 def displayPollen(startTime):
     """Render pollen data to the ScrrollpHAT."""
-    
+
     global showTime
     global pollenReport
     targetTime = startTime + showTime
@@ -204,21 +207,21 @@ def displayPollen(startTime):
 
 
 if __name__ == "__main__":
-    
+
     # Get data on initial start
     pressureReport = updatePressure()
-    # pollenReport = updatePollen()
+    pollenReport = updatePollen()
 
     # Clear the screen
     scrollphathd.clear()
 
     # Start the data update timers, effectively on background threads
     rtPressure = RepeatedTimer(interval, updatePressure)
-    # rtPollen = RepeatedTimer(interval, updatePollen)
+    rtPollen = RepeatedTimer(interval, updatePollen)
 
     # ...and now we can loop
     while True:
         displayClock()
         displayPressure(time.time())
-        # displayPollen(time.time())
+        displayPollen(time.time())
         # ...and around we go again.
