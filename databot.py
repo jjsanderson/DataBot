@@ -180,7 +180,8 @@ def displayPressure(startTime):
         time.sleep(0.05)
 
     scrollphathd.clear()
-    scrollphathd.write_string(str(tempReport), font=font5x5, brightness=BRIGHTNESS)
+    tempString = str(round(tempReport, 1)) + "C"
+    scrollphathd.write_string(tempString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
 
     targetTime = time.time() + showTime
