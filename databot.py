@@ -87,7 +87,7 @@ def updatePressure():
         w = observation.get_weather()
         pressureReport = w.get_pressure()['press']
         tempReport = w.get_temperature(unit='celsius')['temp']
-        # print("Pressure updated from API")
+        print("Pressure updated from API")
     except:
         # Something went wrong, reinstate the old value
         pressureReport = oldReport
@@ -155,7 +155,7 @@ def displayClock():
     global showTime
     # Get the current time
     timeString = time.strftime("%H:%M")
-    # print(timeString)
+    print(timeString)
     scrollphathd.clear()
     scrollphathd.write_string(timeString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
@@ -171,7 +171,7 @@ def displayPressure(startTime):
     scrollphathd.clear()
     scrollphathd.write_string(str(pressureReport), font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()    
-    # print(pressureReport)    
+    print(pressureReport)    
         
     while (time.time() < targetTime):
         time.sleep(0.05)
@@ -207,18 +207,18 @@ if __name__ == "__main__":
     
     # Get data on initial start
     pressureReport = updatePressure()
-    pollenReport = updatePollen()
+    # pollenReport = updatePollen()
 
     # Clear the screen
     scrollphathd.clear()
 
     # Start the data update timers, effectively on background threads
     rtPressure = RepeatedTimer(interval, updatePressure)
-    rtPollen = RepeatedTimer(interval, updatePollen)
+    # rtPollen = RepeatedTimer(interval, updatePollen)
 
     # ...and now we can loop
     while True:
         displayClock()
         displayPressure(time.time())
-        displayPollen(time.time())
+        # displayPollen(time.time())
         # ...and around we go again.
