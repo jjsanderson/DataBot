@@ -180,6 +180,7 @@ def displayPressure(startTime):
         time.sleep(0.05)
 
     scrollphathd.clear()
+    # Round temperature report to 1 decimal place, and append Celsius unit for clarity
     tempString = str(round(tempReport, 1)) + "C"
     scrollphathd.write_string(tempString, font=font5x5, brightness=BRIGHTNESS)
     scrollphathd.show()
