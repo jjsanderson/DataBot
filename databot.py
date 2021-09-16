@@ -139,8 +139,8 @@ def updatePollen():
         elif myReportText == "None":
             pollenReport - " NO POLLEN "
         else:
-            # Not sure of other codes, so just display the raw string
-            pollenReport = myReportText
+            # We didn't get a valid results, so set flag that.
+            pollenReport = "0"
     except:
         # Something went wrong, display error
         pollenReport = " POLLEN ERROR "
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
     # Start the data update timers, effectively on background threads
     rtPressure = RepeatedTimer(interval, updatePressure)
-    rtPollen = RepeatedTimer(interval, updatePollen)
+    rtPollen = RepeatedTimer(interval*2, updatePollen)
     print("Timers running")
     print("looping...")
 
@@ -231,5 +231,6 @@ if __name__ == "__main__":
     while True:
         displayClock()
         displayPressure(time.time())
-        displayPollen(time.time())
+        if pollenReport != "0":
+            displayPollen(time.time())
         # ...and around we go again.
