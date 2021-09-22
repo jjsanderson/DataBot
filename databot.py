@@ -22,7 +22,7 @@ longitude = -1.44713
 interval = 30 * 60 # seconds between API data updates (30 mins)
 showTime = 3  # seconds for each data display. 3 seconds feels about right.
 
-BRIGHTNESS = 0.1 # the ScrollpHAT HD is insanely bright. This is enough, for me.
+BRIGHTNESS = 0.2 # the ScrollpHAT HD is insanely bright. This is enough, for me.
 scrollphathd.rotate(degrees=180) # My unit is in a ScrollBot case. Which is upside-down
 
 # Initialise our variables as globals, with empty values
@@ -139,7 +139,7 @@ def updatePollen():
         elif myReportText == "None":
             pollenReport - " NO POLLEN "
         else:
-            # We didn't get a valid results, so set flag that.
+            # We didn't get a valid result, so flag that.
             pollenReport = "0"
     except:
         # Something went wrong, display error
@@ -214,8 +214,8 @@ if __name__ == "__main__":
     print(">>> DataBot starting")
     # Get data on initial start
     pressureReport = updatePressure()
-    pollenReport = updatePollen()
     print("Initial weather report received")
+    pollenReport = updatePollen()
     print("Initial pollen report received")
 
     # Clear the screen
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     # ...and now we can loop
     while True:
         displayClock()
-        displayPressure(time.time())
+        displayPressure(time.time()) # Includes temperature display, because good structure is optional
         if pollenReport != "0":
             displayPollen(time.time())
         # ...and around we go again.
